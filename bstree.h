@@ -1,23 +1,22 @@
-/*
-	bstree.h
-	Date Written: 4/15
-	Created by: Kyin Edwards
-*/
-
 #ifndef BSTREE_H
 #define BSTREE_H
-
 #include <iostream>
 #include <queue>
 
-template <class K, class V> class bstree; // Forward declaration
-
+template <class K, class V> class bstree;
 template <class K, class V> struct node {
 	K key;
 	V value;
-	node<K, V>* l_ptr; // Points to node's left subtree
-	node<K, V>* r_ptr; // Points to node's right subtree
+	node<K, V>* l_ptr; 
+	node<K, V>* r_ptr; 
 
+	/** Constructor.
+	 * 
+	 * @param key: Key of the pair.
+	 * @param value: Value of the pair.
+	 * @param l_ptr: .
+	 * @param r_ptr: .
+	 */
 	node(const K& key = K(), const V& value = V(), node<K, V>* l_ptr = nullptr, node<K, V>* r_ptr = nullptr) {
 		this->key = key;
 		this->value = value;
@@ -28,10 +27,9 @@ template <class K, class V> struct node {
 
 template <class K, class V> class bstree {
 private:
-	node<K, V>* root_node_ptr; // Points to root node of tree or be nullptr if empty
-	size_t tree_size; // Store tree size, n elements or values currently stored in the binary search tree
+	node<K, V>* root_node_ptr;
+	size_t tree_size; 
 
-	// Recursive functions (example of function overloading for the order functions).
 	void preorder(node<K, V>*) const;
 	void inorder(node<K, V>*) const;
 	void postorder(node<K, V>*) const;
@@ -59,54 +57,44 @@ public:
 	void level_order() const;
 };
 
-/* Default constructor. Sets the root pointer data member of the tree to nullptr and tree size to 0. */
+/** Constructor. */
 template <class K, class V> bstree<K, V>::bstree() {
 	root_node_ptr = nullptr;
 	tree_size = 0;
 }
 
-/* Destructor. Call the clear() method. */
+/** Destructor. */
 template <class K, class V> bstree<K, V>::~bstree() {
 	clear();
 }
 
-/*
-	Copy constructor. Make a copy of the tree nodes by performing a modified preorder traversal.
-
-	@param x Object of the class.
-*/
+/** Copy constructor.
+ *
+ * @param x: Applied to the data members.
+ */
 template <class K, class V> bstree<K, V>::bstree(const bstree<K, V>& x) {
-	// Copy the other bstree object's size
 	tree_size = x.tree_size;
 
 	// Copy the nodes of the other bstree object
 	root_node_ptr = clone(x.root_node_ptr);
-	
-	/*
-	if (x != nullptr) {
-		std::cout << x->value << ' '; // Visit node pointed to by x (using recursion)
-		bstree(x->l_ptr);
-		bstree(x->r_ptr);
-	}
-	*/
 }
 
-/*
-	Overloaded assignment operator.
-
-	@param x Object of the class.
-*/
+/** Overloaded assignment operator.
+ *
+ * @param x: Applied to the data members.
+ * @return: Pointer to this object.
+ */
 template <class K, class V> bstree<K, V>& bstree<K, V>::operator=(const bstree<K, V>& x) {
 	if (this != &x) {
-		clear(); // Make left bstree object empty
-		tree_size = x.tree_size; // Copy the other bstree object's size
-		root_node_ptr = clone(x.root_node_ptr); // Copies nodes of other bstree object
+		clear();
+		tree_size = x.tree_size; 
+		root_node_ptr = clone(x.root_node_ptr); 
 	}
 
 	return *this;
 }
 
-/* Set the tree back to empty state, deleting all nodes of the tree and setting size to 0. */
+/** Set tree to default state. */
 template <class K, class V> void bstree<K, V>::clear() {
 	destroy(root_node_ptr);
 	root_node_ptr = nullptr;
@@ -114,23 +102,26 @@ template <class K, class V> void bstree<K, V>::clear() {
 	tree_size = 0;
 }
 
-/* @return the tree size. */
+/** Accessor methods. */
 template <class K, class V> size_t bstree<K, V>::size() const {
 	return tree_size;
 }
 
-/* Call private member height(). */
 template <class K, class V> size_t bstree<K, V>::height() const {
 	return height(root_node_ptr);
 }
 
-/* @return the tree height. */
+/** Get the tree's height.
+ * 
+ * @return: The tree's height. 
+ */
 template <class K, class V> size_t bstree<K, V>::height(node<K, V>* p) const {
 	size_t tree_height = 0;
-	// p : pointer to a tree node
-    // l_height : computed height of node's left subtree
-    // r_height : computed height of node's right subtree
+	// p: Pointer to a tree node.
+    // l_height: Computed height of node's left subtree.
+    // r_height: Computed height of node's right subtree.
 	
+	// Pointer does not point to a node.
 	if (p == nullptr)
 		return tree_height;
 	
@@ -143,51 +134,56 @@ template <class K, class V> size_t bstree<K, V>::height(node<K, V>* p) const {
         return r_height + 1;
 }
 
-/* @return true if the tree size is 0. */
+/** Check if the tree is empty. 
+ * 
+ * @return: True if the size of the tree is 0. 
+ */
 template <class K, class V> bool bstree<K, V>::empty() const {
 	return (tree_size == 0);
 }
 
-/* @return the minimum key in the tree. */
+/** Get the minimum key in the tree.
+ * 
+ * @return: The minimum key in the tree. 
+ */
 template <class K, class V> const K& bstree<K, V>::min() const {
 	node <K, V>* p = root_node_ptr;
-	// Continue down the tree.
-		while (p->l_ptr != nullptr)
-			p = p->l_ptr;
+	
+	while (p->l_ptr != nullptr)
+		p = p->l_ptr;
 
 	return p->key;
 }
 
-/* @return the maximum key in the tree. */
+/** Get the maximum key in the tree. 
+ * 
+ * @return: The maximum key in the tree. 
+ */
 template <class K, class V> const K& bstree<K, V>::max() const {	
 	node <K, V>* p = root_node_ptr;
-	// Continue up the tree.
-		while (p->r_ptr != nullptr)
-			p = p->r_ptr;
+	
+	while (p->r_ptr != nullptr)
+		p = p->r_ptr;
 
 	return p->key;
 }
 
-/*
-	Insert a key and value into binary search tree.
-
-	@param key pass into binary tree search if it does not exist.
-
-	@param value pass into binary tree search.
-
-	@return If the key already exists in the tree, return false, else a new tree node containing the key and value will be inserted in the correct spot to maintain the ordered property of the binary search tree, size incremented and return true.
-*/
+/** Check for duplicate keys or null links.
+ *
+ * @param key: The key assigned to a node.
+ * @param value: The value assigned to a node.
+ * @return: Return false if the key exists in the tree.
+ */
 template <class K, class V> bool bstree<K, V>::insert(const K& key, const V& value) {
-	node<K, V>* p; // p: pointer to a tree node
-	node<K, V>* parent; // pointer to the parent node of the node to delete from the tree (or nullptr if deleting the root node)
-	// node<K, V>* new_node = new node<K, V>(p); // Allocate a new tree node, new_node. new_node: pointer used to create a new tree node
-	std::queue<node<K, V>*> q; // q: a queue of pointers to tree nodes(nullptr if p points to the root node)
+	node<K, V>* p; 
+	node<K, V>* parent; 
+	std::queue<node<K, V>*> q;
 
 	// Start at the root of the tree.
 	p = root_node_ptr;
 	parent = nullptr;
 
-	// Search the tree for a null link or a duplicate key (if duplicates are disallowed).
+	// Search the tree for a null link or a duplicate key.
 	while (p != nullptr && key != p->key) {
 		parent = p;
 		if (key < p->key)
@@ -200,7 +196,7 @@ template <class K, class V> bool bstree<K, V>::insert(const K& key, const V& val
 	if (p != nullptr)
 		return false;
 
-	// Otherwise, create a tree node and insert it as a new leaf node (create a new tree node new_node to contain key and value).
+	// Create a tree node and insert it as a new leaf node.
 	node<K, V>* new_node = new node<K, V>(key, value);
 
 	if (parent == nullptr)
@@ -210,7 +206,6 @@ template <class K, class V> bool bstree<K, V>::insert(const K& key, const V& val
 			parent->l_ptr = new_node;
 		else
 			parent->r_ptr = new_node;
-
 	}
 
 	tree_size = tree_size + 1;
@@ -219,18 +214,16 @@ template <class K, class V> bool bstree<K, V>::insert(const K& key, const V& val
 	return true;
 }
 
-/*
-	Remove specified key from binary search tree.
-
-	@param key Specified key to be removed.
-
-	@return False if the key is not in the tree.
-*/
+/** Remove specified key from binary search tree.
+ *
+ * @param key: Specified key to be removed.
+ * @return: False if the key is not in the tree.
+ */
 template <class K, class V> bool bstree<K, V>::remove(const K& key) {
-	node<K, V>* p; //pointer to the node to delete from the tree
-	node<K, V>* parent; // pointer to the parent node of the node to delete from the tree (or nullptr if deleting the root node)
-	node<K, V>* replace; // pointer to node that will replace the deleted node
-	node<K, V>* replace_parent; // pointer to parent of node that will replace the deleted node
+	node<K, V>* p; 
+	node<K, V>* parent;
+	node<K, V>* replace; 
+	node<K, V>* replace_parent; 
 
 	// Start at the root of the tree and search for the key to delete.
 	p = root_node_ptr;
@@ -248,38 +241,32 @@ template <class K, class V> bool bstree<K, V>::remove(const K& key) {
 		return false;
 
 	if (p->l_ptr == nullptr)
-		// Case 1a: p has no children. Replace p with its right child (which is nullptr).
-		//   - or -
-		// Case 1b: p has no left child but has a right child. Replace p with its right child.
 		replace = p->r_ptr;
+	
 	else if (p->r_ptr == nullptr)
-		// Case 2: p has a left child but no right child. Replace p with its left child.
 		replace = p->l_ptr;
+	
 	else {
-		// Case 3: p has two children. Replace p with its inorder predecessor.
-
-		// Go left...
 		replace_parent = p;
 		replace = p->l_ptr;
 
-		// ...then all the way to the right.
 		while (replace->r_ptr != nullptr) {
 			replace_parent = replace;
 			replace = replace->r_ptr;
 		}
 
-		// If we were able to go to the right, make the replacement node's left child the right child of its parent. Then make the left child of p the replacement's left child.
 		if (replace_parent != p) {
 			replace_parent->r_ptr = replace->l_ptr;
 			replace->l_ptr = p->l_ptr;
 		}
-		// Make the right child of p the replacement's right child.
+
 		replace->r_ptr = p->r_ptr;
 	}
 
-	// Connect replacement node to the parent node of p (or the root if p has no parent).    
+	// Connect replacement node to the parent node of p.    
 	if (parent == nullptr)
 		root_node_ptr = replace;
+	
 	else {
 		if (p->key < parent->key)
 			parent->l_ptr = replace;
@@ -287,24 +274,19 @@ template <class K, class V> bool bstree<K, V>::remove(const K& key) {
 			parent->r_ptr = replace;
 	}
 
-	// Delete the node, decrement the tree size, and signal success.
-	// destroy(p->key); // Delete the node pointed to by p
 	delete p;
-	// or delete[] p->value; // delete node pointed to by p?
 	tree_size = tree_size - 1;
 
 	return true;
 }
 
-/*
-	Attempt to find the specified key in binary search tree.
-
-	@param key Specified key to be found.
-
-	@return if the key is not within the tree, the function returns nullptr, else the address of the node that contained the key.
-*/
+/** Find the specified key in binary search tree.
+ *
+ * @param key: Specified key to be found.
+ * @return: If the key is not within the tree, the function returns nullptr.
+ */
 template <class K, class V> const node<K, V>* bstree<K, V>::find(const K& key) const {
-	node<K, V>* p = root_node_ptr; // Pointer to tree node, start at the root of the tree.
+	node<K, V>* p = root_node_ptr; 
 
 	// Search the tree for a null link or a matching key.
 	while (p != nullptr && key != p->key) {
@@ -314,30 +296,26 @@ template <class K, class V> const node<K, V>* bstree<K, V>::find(const K& key) c
 			p = p->r_ptr;
 	}
 
-	// p either points to the node with a matching key or is nullptr if the key is not in the tree.
-	return p; // Or you can return true if the key is found
+	return p; 
 }
 
-/* Public member, call to private preorder function. */
+/** Accessor methods. */
 template <class K, class V> void bstree<K, V>::preorder() const {
 	preorder(root_node_ptr);
 }
 
-/* Public member, call to private inorder function. */
 template <class K, class V> void bstree<K, V>::inorder() const {
 	inorder(root_node_ptr);
 }
 
-/* Public member, call to private postorder function. */
 template <class K, class V> void bstree<K, V>::postorder() const {
 	postorder(root_node_ptr);
 }
 
-/*
-	Perform preorder traversal of the tree from left to right.
-
-	@param p Pointer to a tree node.
-*/
+/** Perform preorder traversal of the tree from left to right.
+ *
+ * @param p: Pointer to a tree node.
+ */
 template <class K, class V> void bstree<K, V>::preorder(node<K, V>* p) const {
 	if (p != nullptr) {
 		std::cout << p->key << ": " << p->value << ' ' << "\n";
@@ -346,86 +324,75 @@ template <class K, class V> void bstree<K, V>::preorder(node<K, V>* p) const {
 	}
 }
 
-/*
-	Perform inorder traversal of the tree from left to right.
-
-	@param p Pointer to a tree node.
-*/
+/** Perform inorder traversal of the tree from left to right.
+ *
+ * @param p: Pointer to a tree node.
+ */
 template <class K, class V> void bstree<K, V>::inorder(node<K, V>* p) const {
 	if (p != nullptr) {
 		inorder(p->l_ptr);
-		std::cout << p->key << ": " << p->value << ' ' << "\n"; // Visit the node pointed to by p
+		std::cout << p->key << ": " << p->value << ' ' << "\n";
 		inorder(p->r_ptr);
 	}
 }
 
-/*
-	Perform postorder traversal of the tree from left to right.
-
-	@param p Pointer to a tree node.
-*/
+/** Perform postorder traversal of the tree from left to right.
+ *
+ * @param p: Pointer to a tree node.
+ */
 template <class K, class V> void bstree<K, V>::postorder(node<K, V>* p) const {
 	if (p != nullptr) {
 		postorder(p->l_ptr);
 		postorder(p->r_ptr);
-		std::cout << p->key << ": " << p->value << ' ' << "\n"; // Visit the node pointed to by p
+		std::cout << p->key << ": " << p->value << ' ' << "\n"; 
 	}
 }
 
-/* Perform level order traversal of tree from left to right. */
+/** Perform level order traversal of tree from left to right. */
 template <class K, class V> void bstree<K, V>::level_order() const {
-	node<K, V>* p; // pointer to a tree node
-	std::queue<node<K, V>*> q; // a queue of pointers to tree nodes
+	node<K, V>* p; 
+	std::queue<node<K, V>*> q; 
 
-	// If tree is empty, return.
 	if (root_node_ptr == nullptr)
 		return;
 
 	q.push(root_node_ptr);
 
 	while (!q.empty()) {
-		// Remove front item in the queue and visit it.
 		p = q.front();
 		q.pop();
-		// Visit the node pointed to by p
 		std::cout << p->key << ": " << p->value << ' ' << "\n";
 
-		// Insert left child of p into queue.
 		if (p->l_ptr != nullptr)
 			q.push(p->l_ptr);
 
-		// Insert right child of p into queue.
 		if (p->r_ptr != nullptr)
 			q.push(p->r_ptr);
 	}
 }
 
-/*
-	Recursively deletes the nodes of a bstree object (modified postorder traversal of the tree).
-
-	@param p Pointer to a tree node.
-*/
+/** Recursively deletes the nodes of a bstree object.
+ *	
+ * @param p Pointer to a tree node.
+ */
 template <class K, class V> void bstree<K, V>::destroy(node<K, V>* p) const {
 	if (p != nullptr) {
 		destroy(p->l_ptr);
 		destroy(p->r_ptr);
 	}
 
-	// delete[] p->value; // delete node pointed to by p
 	delete p;
 }
 
-/*
-	Recursively copies the nodes of a bstree object. This is a modified version of a preorder traversal of the tree.
-
-	@param p Pointer to a tree node.
-
-	@return The new_node after reaching nullptr, else nullptr.
-*/
+/** Recursively copies the nodes of a bstree object. This is a modified version of a
+ *  preorder traversal of the tree.
+ *
+ * @param p: Pointer to a tree node.
+ * @return: The new node after reaching nullptr.
+ */
 template <class K, class V> node<K, V>* bstree<K, V>::clone(node<K, V>* p) const {
 	if (p != nullptr) {
-		// Make a copy of the node pointed to by p.
-		node<K, V>* new_node = new node<K, V>(); // Allocate a new tree node, new_node
+		node<K, V>* new_node = new node<K, V>(); 
 		new_node->key = p->key;
 		new_node->value = p->value;
 
@@ -435,9 +402,9 @@ template <class K, class V> node<K, V>* bstree<K, V>::clone(node<K, V>* p) const
 
 		return new_node;
 	}
+
 	else
 		return nullptr;
-
 }
 
 #endif
